@@ -14,19 +14,25 @@ function App() {
   const [msg, setMsg] = useState();
 
   const searchPressed = async () => {
-    const res = await fetch(`${api.base}weather?q=${search}&units=metric&APPID=${api.key}`)
-    if(res.ok){
-      setError(false);
-      const result = await res.json()
-      //console.log(result)
-      setWeather(result)
-    }else{
+    setWeather(null);
+    setError(false);
+    setMsg(null);
+  
+    try {
+      const res = await fetch(`${api.base}weather?q=${search}&units=metric&APPID=${api.key}`);
+      if(res.ok){
+        const result = await res.json();
+        setWeather(result);
+      }else{
+        const result = await res.json();
+        setError(true);
+        setMsg(result);
+      }
+    } catch (error) {
       setError(true);
-      const result = await res.json();
-      // console.log(result);
-      setMsg(result);
+      setMsg({ message: 'An unexpected error occurred' });
     }
-  }
+  };
 
   return (
     <>
@@ -39,7 +45,7 @@ function App() {
       </div>
 
 
-       { weather && 
+       { weather &&
         <div>
           <p>{weather.name}</p>
           <p>{weather.main.temp}°C</p>
